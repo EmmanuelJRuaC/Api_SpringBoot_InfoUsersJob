@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.api.infousersjob.models.UsersModel;
 import com.api.infousersjob.query_dao.dao.UsersDAO;
+import com.api.infousersjob.query_jpa.services.UsersService;
 
 @RestController
 @RequestMapping("/users")
@@ -21,10 +22,31 @@ public class UsersController {
     @Autowired
     private UsersDAO usersDAO;
 
-    // Metodo para obtener toda la lista de usuarios
-    @GetMapping("/getusers")
+    @Autowired
+    private UsersService usersService;
+
+    // =================
+    // Metodos: GET
+    // =================
+
+    // Metodo para obtener toda la lista de usuarios (DAO)
+    @GetMapping("/getusers/dao")
     public ResponseEntity<?> getUsers() throws SQLException {
         ArrayList<UsersModel> users = usersDAO.getUsers();
+
+        if (users.isEmpty()) {
+        return ResponseEntity.
+            status(HttpStatus.NOT_FOUND).
+            body(Map.of("Mensaje", "No se encontraron usuarios"));
+        }
+
+        return ResponseEntity.ok(users);
+    }
+
+    // Metodo para obtener toda la lista de usuarios (JPA)
+    @GetMapping("/getusers/jpa")
+    public ResponseEntity<?> getUsersjpa() throws SQLException {
+        ArrayList<UsersModel> users = usersService.getUsers();
 
         if (users.isEmpty()) {
         return ResponseEntity.
